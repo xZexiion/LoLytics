@@ -8,6 +8,7 @@ function App() {
                 <input className="input-left" placeholder="Name" />
                 <input className="input-right" placeholder="Tag" />
             </div>
+            <button className="search-button"><span className='search-button-text'>Search</span></button>
         </div>
     );
 }

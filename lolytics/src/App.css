@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
 body {
     margin: 0;
     background-color: #1e1e1e;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Roboto;
     color: white;
 }
 
@@ -40,7 +42,8 @@ input:hover {
     background-color: #2e2e2e;
 }
 
-.input-left, .input-right {
+.input-left,
+.input-right {
     border: none;
     padding: 20px;
     font-size: 16px;
@@ -54,4 +57,31 @@ input:hover {
 
 .input-right {
     width: 20%;
+}
+
+.search-button {
+    width: 10%;
+    color: white;
+    margin-top: 20px;
+    background-color: #15a9ff;
+    font-size: 16px;
+    padding: 10px;
+    border: none;
+    border-radius: 999px;
+    overflow: hidden; /* Prevent scaled text from spilling */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-button-text {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.search-button:hover .search-button-text {
+    transform: scale(1.1);
+}
+
+.search-button:hover {
+    background-color: #3fb3f7;
 }
