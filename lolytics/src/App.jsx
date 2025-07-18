@@ -1,7 +1,12 @@
+import './App.css';
+
 function App() {
     return (
-        <h1>Hello, world!</h1>
-    )
+        <div className="container">
+            <div className="title">LoLytics</div>
+        </div>
+    );
 }
+
 
 export default App
