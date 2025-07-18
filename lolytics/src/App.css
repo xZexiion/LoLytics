@@ -5,6 +5,20 @@ body {
     color: white;
 }
 
+input {
+    outline: none;
+    box-shadow: none;
+}
+
+input {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+input:hover {
+    background-color: #3b3b3b;
+    transform: scale(1.02);
+}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -16,4 +30,28 @@ body {
 .title {
     font-size: 128px;
     margin-bottom: 40px;
+}
+
+.input-group {
+    display: flex;
+    width: 600px;
+    border-radius: 999px;
+    overflow: hidden;
+    background-color: #2e2e2e;
+}
+
+.input-left, .input-right {
+    border: none;
+    padding: 20px;
+    font-size: 16px;
+    color: white;
+    background-color: transparent;
+}
+
+.input-left {
+    width: 80%;
+}
+
+.input-right {
+    width: 20%;
 }
