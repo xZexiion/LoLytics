@@ -13,13 +13,7 @@ async function get_batch(match_ids) {
 	for(const result of results) {
 		batch.push(result);
 	}
-	const cleanBatch = [];
-	for(let i = 0; i < batch.length; i++) {
-		if (batch[i] != null ) {
-			cleanBatch.push(batch[i]);
-		}
-	}
-	return cleanBatch;
+	return batch.filter(batch => batch != null);
 }
 
 (async () => {
