@@ -1,7 +1,7 @@
 import { get_game_data } from "./game.js";
 import fs from 'fs';
 import { api_keys } from "./api_keys.js";
-import { getMatchIDs } from "./get_matche_ids.js";
+import { get_ids } from "./get_matche_ids.js";
 
 async function get_batch(match_ids) {
 	const promises = [];
@@ -23,7 +23,7 @@ async function get_batch(match_ids) {
 }
 
 (async () => {
-	let matchIDs = await getMatchIDs('EMERALD');
+	let matchIDs = await get_ids('EMERALD');
 	matchIDs = new Set(matchIDs);
 	matchIDs = Array.from(matchIDs);
 

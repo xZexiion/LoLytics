@@ -16,7 +16,7 @@ function shuffle(array) {
 	return array;
 }
 
-async function getSummonerIDs(rank, tier, page, key) {
+async function get_summoner_ids(rank, tier, page, key) {
 	const summonerIDs = [];
 	if(rank == 'CHALLENGER') {
 		let response = await api_call(`https://euw1.api.riotgames.com/lol/league/v4/challengerleagues/by-queue/RANKED_SOLO_5x5?api_key=${key}`);
@@ -47,8 +47,8 @@ async function getSummonerIDs(rank, tier, page, key) {
 	return summonerIDs;
 }
 
-async function getSummonerMatchIDs(summonerID, key) {
-	let puuid = await api_call(`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/${summonerID}?api_key=${key}`);
+async function get_summoner_match_ids(summoner_id, key) {
+	let puuid = await api_call(`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/${summoner_id}?api_key=${key}`);
 	puuid = await puuid.json();
 	puuid = puuid.puuid;
 
@@ -64,9 +64,9 @@ async function get_match_id_batch(rank, tier, page, key) {
 	let matchIDs = [];
 	const limit = 250;
 
-	const summonerIDs = await getSummonerIDs(rank, tier, page, key);
+	const summonerIDs = await get_summoner_ids(rank, tier, page, key);
 	for (const summoner_id of summonerIDs) {
-		matchIDs = matchIDs.concat(await getSummonerMatchIDs(summoner_id, key));
+		matchIDs = matchIDs.concat(await get_summoner_match_ids(summoner_id, key));
 		if(matchIDs.length >= limit) {
 			break;
 		}
@@ -75,7 +75,7 @@ async function get_match_id_batch(rank, tier, page, key) {
 	return matchIDs;
 }
 
-export async function getMatchIDs(rank) {
+export async function get_ids(rank) {
 	const promises = [];
 
 	const tiers = ['I', 'II', 'III', 'IV'];
