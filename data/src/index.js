@@ -23,15 +23,15 @@ async function get_batch(match_ids) {
 }
 
 (async () => {
-	let matchIDs = await get_ids('EMERALD');
-	matchIDs = new Set(matchIDs);
-	matchIDs = Array.from(matchIDs);
+	let match_ids = await get_ids();
+	match_ids = new Set(match_ids);
+	match_ids = Array.from(match_ids);
 
-	console.log(`Processing ${matchIDs.length} matches`);
+	console.log(`Processing ${match_ids.length} matches`);
 
 	let idx = 0;
-	for(let i = 0; i < matchIDs.length; i += api_keys.length) {
-		let batch = await get_batch(matchIDs.slice(i, i + api_keys.length));
+	for(let i = 0; i < match_ids.length; i += api_keys.length) {
+		let batch = await get_batch(match_ids.slice(i, i + api_keys.length));
 		for(const game of batch) {
 			idx++;
 			fs.mkdirSync(`match_data/game_${idx}`);
