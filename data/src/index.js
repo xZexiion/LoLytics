@@ -3,6 +3,7 @@ import fs from 'fs';
 import { api_keys } from "./api_keys.js";
 import { get_ids } from "./get_match_ids.js";
 
+
 async function get_batch(match_ids) {
 	const promises = [];
 	for (let i = 0; i < match_ids.length; i++) {
@@ -16,10 +17,15 @@ async function get_batch(match_ids) {
 	return batch.filter(batch => batch != null);
 }
 
+
 (async () => {
-	let match_ids = await get_ids();
+	let match_ids = await get_ids('EMERALD');
 	match_ids = new Set(match_ids);
 	match_ids = Array.from(match_ids);
+
+	console.log(match_ids);
+
+	return;
 
 	console.log(`Processing ${match_ids.length} matches`);
 
