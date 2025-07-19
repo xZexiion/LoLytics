@@ -1,8 +1,6 @@
 import { api_call } from "./utils.js";
 import { api_keys } from "./api_keys.js";
 
-const START_DATE = '2023.12.10';
-
 function shuffle(array) {
 	let currentIndex = array.length,  randomIndex;
 
@@ -52,7 +50,10 @@ async function get_summoner_match_ids(summoner_id, key) {
 	puuid = await puuid.json();
 	puuid = puuid.puuid;
 
-	const start = Math.floor(new Date(START_DATE).getTime() / 1000);
+	const now = new Date();
+	const oneMonthAgo = new Date(now);
+	oneMonthAgo.setMonth(now.getMonth() - 1);
+	const start = Math.floor(oneMonthAgo.getTime() / 1000);
 
 	let matchHistory = await api_call(`https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=${start}&queue=420&start=0&count=50&api_key=${key}`)
 	matchHistory = await matchHistory.json();
