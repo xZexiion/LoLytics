@@ -1,9 +1,13 @@
 import 'node-fetch';
 import fs from 'fs'
-let API_KEYS;
+import { config } from 'dotenv';
+
+config();
+
+let API_KEYS = [process.env.API_KEY];
 let TIME_BETWEEN_REQUESTS = 1300;
 const NUM_PLAYERS = 10000;
-const MATCHES_PER_PLAYER = 20;
+const MATCHES_PER_PLAYER = 40;
 const MAX_MATCHES = 20000;
 const MAX_MATCH_AGE = 7 * 24 * 60 * 60 * 1000;
 
