@@ -2,13 +2,16 @@ import { api_call } from "./utils.js";
 import { API_KEYS } from "./api_keys.js";
 
 function shuffle(array) {
-	let current_index = array.length, random_index;
+	let current_index = array.length,
+		random_index;
 
 	while (current_index > 0) {
 		random_index = Math.floor(Math.random() * current_index);
 		current_index--;
 		[array[current_index], array[random_index]] = [
-			array[random_index], array[current_index]];
+			array[random_index],
+			array[current_index],
+		];
 	}
 
 	return array;
@@ -16,26 +19,34 @@ function shuffle(array) {
 
 async function get_summoner_ids(rank, tier, page, key) {
 	const summoner_ids = [];
-	if (rank == 'CHALLENGER') {
-		let response = await api_call(`https://euw1.api.riotgames.com/lol/league/v4/challengerleagues/by-queue/RANKED_SOLO_5x5?api_key=${key}`);
+	if (rank == "CHALLENGER") {
+		let response = await api_call(
+			`https://euw1.api.riotgames.com/lol/league/v4/challengerleagues/by-queue/RANKED_SOLO_5x5?api_key=${key}`,
+		);
 		response = await response.json();
 		for (const summoner of response.entries) {
 			summoner_ids.push(summoner.summonerId);
 		}
-	} else if (rank == 'GRANDMASTER') {
-		let response = await api_call(`https://euw1.api.riotgames.com/lol/league/v4/grandmasterleagues/by-queue/RANKED_SOLO_5x5?api_key=${key}`);
+	} else if (rank == "GRANDMASTER") {
+		let response = await api_call(
+			`https://euw1.api.riotgames.com/lol/league/v4/grandmasterleagues/by-queue/RANKED_SOLO_5x5?api_key=${key}`,
+		);
 		response = await response.json();
 		for (const summoner of response.entries) {
 			summoner_ids.push(summoner.summonerId);
 		}
-	} else if (rank == 'MASTER') {
-		let response = await api_call(`https://euw1.api.riotgames.com/lol/league/v4/masterleagues/by-queue/RANKED_SOLO_5x5?api_key=${key}`);
+	} else if (rank == "MASTER") {
+		let response = await api_call(
+			`https://euw1.api.riotgames.com/lol/league/v4/masterleagues/by-queue/RANKED_SOLO_5x5?api_key=${key}`,
+		);
 		response = await response.json();
 		for (const summoner of response.entries) {
 			summoner_ids.push(summoner.summonerId);
 		}
 	} else {
-		let response = await api_call(`https://euw1.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/${rank}/${tier}?page=${page}&api_key=${key}`);
+		let response = await api_call(
+			`https://euw1.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/${rank}/${tier}?page=${page}&api_key=${key}`,
+		);
 		response = await response.json();
 		for (const summoner of response) {
 			summoner_ids.push(summoner.summonerId);
@@ -46,7 +57,9 @@ async function get_summoner_ids(rank, tier, page, key) {
 }
 
 async function get_summoner_match_ids(summoner_id, key) {
-	let puuid = await api_call(`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/${summoner_id}?api_key=${key}`);
+	let puuid = await api_call(
+		`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/${summoner_id}?api_key=${key}`,
+	);
 	puuid = await puuid.json();
 	puuid = puuid.puuid;
 
@@ -55,7 +68,9 @@ async function get_summoner_match_ids(summoner_id, key) {
 	one_month_ago.setMonth(now.getMonth() - 1);
 	const start = Math.floor(one_month_ago.getTime() / 1000);
 
-	let match_history = await api_call(`https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=${start}&queue=420&start=0&count=50&api_key=${key}`)
+	let match_history = await api_call(
+		`https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=${start}&queue=420&start=0&count=50&api_key=${key}`,
+	);
 	match_history = await match_history.json();
 
 	return match_history;
@@ -66,9 +81,14 @@ async function get_match_id_batch(rank, tier, page) {
 	let match_ids = [];
 
 	const summoner_ids = await get_summoner_ids(rank, tier, page, API_KEYS[0]);
-	for (const summoner_id of summoner_ids) {
-		promises.push(get_summoner_match_ids(summoner_id, API_KEYS[promises.length]));
-		if (promises.length >= API_KEYS.length) {
+	for (const summoner_id of summoner_ids.slice(0, 1)) {
+		promises.push(
+			get_summoner_match_ids(summoner_id, API_KEYS[promises.length]),
+		);
+		if (
+			promises.length >= API_KEYS.length ||
+			summoner_id == summoner_ids[summoner_ids.length - 1]
+		) {
 			const results = await Promise.all(promises);
 			match_ids = match_ids.concat(...results);
 			promises = [];
@@ -81,7 +101,7 @@ async function get_match_id_batch(rank, tier, page) {
 export async function get_ids(rank) {
 	let match_ids = [];
 
-	const tiers = ['I', 'II', 'III', 'IV'];
+	const tiers = ["I", "II", "III", "IV"];
 	for (const tier of tiers) {
 		const results = await get_match_id_batch(rank, tier, 1);
 		match_ids = match_ids.concat(results);
