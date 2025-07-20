@@ -33,7 +33,7 @@ async function download_games(rank) {
 			idx++;
 			fs.mkdirSync(`match_data/${rank}/game_${idx}`);
 			for (let j = 0; j < game.length; j++) {
-				fs.writeFileSync(`match_data/game_${idx}/${j}.json`, JSON.stringify(game[j]));
+				fs.writeFileSync(`match_data/${rank}/game_${idx}/${j}.json`, JSON.stringify(game[j]));
 			}
 		}
 		console.log(`Processed ${idx} matches`);
