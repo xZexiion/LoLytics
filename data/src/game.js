@@ -145,6 +145,8 @@ function process_monster_kill(state, event) {
 		state.teams[team_id].drakes.push(event.monsterSubType);
 	} else if (event.monsterType == 'RIFTHERALD') {
 		state.teams[team_id].rifts += 1;
+	} else if (event.monsterType == 'HORDE') {
+		state.teams[team_id].grubs += 1;
 	} else if (event.monsterType == 'BARON_NASHOR') {
 		for (const player of state.teams[team_id].players) {
 			// Only give the baron buff to players who are alive
