@@ -17,15 +17,12 @@ async function get_batch(match_ids) {
 	return batch.filter(batch => batch != null);
 }
 
-
-(async () => {
-	let match_ids = await get_ids('EMERALD');
+async function download_games(rank) {
+	let match_ids = await get_ids(rank);
 	match_ids = new Set(match_ids);
 	match_ids = Array.from(match_ids);
 
 	console.log(match_ids);
-
-	return;
 
 	console.log(`Processing ${match_ids.length} matches`);
 
@@ -34,11 +31,24 @@ async function get_batch(match_ids) {
 		let batch = await get_batch(match_ids.slice(i, i + API_KEYS.length));
 		for (const game of batch) {
 			idx++;
-			fs.mkdirSync(`match_data/game_${idx}`);
+			fs.mkdirSync(`match_data/${rank}/game_${idx}`);
 			for (let j = 0; j < game.length; j++) {
 				fs.writeFileSync(`match_data/game_${idx}/${j}.json`, JSON.stringify(game[j]));
 			}
 		}
 		console.log(`Processed ${idx} matches`);
 	}
-})();
+}
+
+async function main() {
+	const ranks = ['IRON', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'EMERALD', 'DIAMOND', 'MASTER', 'GRANDMASTER', 'CHALLENGER'];
+
+	fs.mkdirSync(`match_data`);
+	for (const rank of ranks) {
+		fs.mkdirSync(`match_data/${rank}`);
+		await download_games(rank);
+	}
+}
+
+main();
+
