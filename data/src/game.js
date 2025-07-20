@@ -56,8 +56,8 @@ async function create_initial_state(game) {
 				1, // Bot outer
 				1, // Bot inner
 				1, // Bot base
-				1, // Nexus
-				1 // Nexus
+				0, // Nexus
+				0 // Nexus
 			],
 			inhibs: [
 				0, // Top
@@ -126,6 +126,12 @@ function update_general_stats(state, frame) {
 			state.teams[team_id].inhibs[i] -= 1;
 			state.teams[team_id].inhibs[i] = Math.max(state.teams[team_id].inhibs[i], 0); // Cap inhib respawn timer to 0
 		}
+
+		// Update nexus tower timers
+		for(const tower_id of [9, 10]) {
+			state.teams[team_id].towers[tower_id] -= 1;
+			state.teams[team_id].towers[tower_id] = Math.max(state.teams[team_id].towers[tower_id], 0); // Cap tower respawn timer to 0
+		}
 	}
 }
 
@@ -186,14 +192,19 @@ function process_building_kill(state, event) {
 		} else if (event.towerType == 'BASE_TURRET') {
 			tower_id += 2;
 		} else if (event.towerType == 'NEXUS_TURRET') {
-			const num_nexus_towers = state.teams[team_id].towers[9] + state.teams[team_id].towers[10];
-			if (num_nexus_towers == 2) {
+			const t1 = state.teams[team_id].towers[9];
+			const t2 = state.teams[team_id].towers[10];
+			if (t1 == 0 && t2 == 0) {
 				tower_id = 10;
 			} else {
 				tower_id = 9;
 			}
 		}
-		state.teams[team_id].towers[tower_id] = 0;
+		if (tower_id == 9 || tower_id == 10) {
+			state.teams[team_id].towers[tower_id] = 3;
+		} else {
+			state.teams[team_id].towers[tower_id] = 0;
+		}
 		
 	} else if (event.buildingType == 'INHIBITOR_BUILDING') {
 		let lane = 0;
