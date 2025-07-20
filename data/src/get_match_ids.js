@@ -1,5 +1,5 @@
 import { api_call } from "./utils.js";
-import { api_keys } from "./api_keys.js";
+import { API_KEYS } from "./api_keys.js";
 
 function shuffle(array) {
 	let current_index = array.length, random_index;
@@ -61,15 +61,17 @@ async function get_summoner_match_ids(summoner_id, key) {
 	return match_history;
 }
 
-async function get_match_id_batch(rank, tier, page, key) {
+async function get_match_id_batch(rank, tier, page) {
+	let promises = [];
 	let match_ids = [];
-	const limit = 250;
 
-	const summoner_ids = await get_summoner_ids(rank, tier, page, key);
+	const summoner_ids = await get_summoner_ids(rank, tier, page, API_KEYS[0]);
 	for (const summoner_id of summoner_ids) {
-		match_ids = match_ids.concat(await get_summoner_match_ids(summoner_id, key));
-		if (match_ids.length >= limit) {
-			break;
+		promises.push(get_summoner_match_ids(summoner_id, API_KEYS[promises.length]));
+		if (promises.length >= API_KEYS.length) {
+			const results = await Promise.all(promises);
+			match_ids = match_ids.concat(...results);
+			promises = [];
 		}
 	}
 
@@ -77,19 +79,13 @@ async function get_match_id_batch(rank, tier, page, key) {
 }
 
 export async function get_ids(rank) {
-	const promises = [];
+	let match_ids = [];
 
 	const tiers = ['I', 'II', 'III', 'IV'];
-	let idx = 0;
 	for (const tier of tiers) {
-		for (let i = 0; i < 10; i++) {
-			promises.push(get_match_id_batch(rank, tier, i + 1, api_keys[idx]));
-			idx++;
-		}
+		const results = await get_match_id_batch(rank, tier, 1);
+		match_ids = match_ids.concat(results);
 	}
-
-	const results = await Promise.all(promises);
-	const match_ids = [].concat(...results);
 
 	shuffle(match_ids);
 	return match_ids;
