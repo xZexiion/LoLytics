@@ -25,7 +25,7 @@ async function get_summoner_ids(rank, tier, page, key) {
 		);
 		response = await response.json();
 		for (const summoner of response.entries) {
-			summoner_ids.push(summoner.summonerId);
+			summoner_ids.push(summoner.puuid);
 		}
 	} else if (rank == "GRANDMASTER") {
 		let response = await api_call(
@@ -33,7 +33,7 @@ async function get_summoner_ids(rank, tier, page, key) {
 		);
 		response = await response.json();
 		for (const summoner of response.entries) {
-			summoner_ids.push(summoner.summonerId);
+			summoner_ids.push(summoner.puuid);
 		}
 	} else if (rank == "MASTER") {
 		let response = await api_call(
@@ -41,7 +41,7 @@ async function get_summoner_ids(rank, tier, page, key) {
 		);
 		response = await response.json();
 		for (const summoner of response.entries) {
-			summoner_ids.push(summoner.summonerId);
+			summoner_ids.push(summoner.puuid);
 		}
 	} else {
 		let response = await api_call(
@@ -49,7 +49,7 @@ async function get_summoner_ids(rank, tier, page, key) {
 		);
 		response = await response.json();
 		for (const summoner of response) {
-			summoner_ids.push(summoner.summonerId);
+			summoner_ids.push(summoner.puuid);
 		}
 	}
 	shuffle(summoner_ids);
@@ -57,19 +57,13 @@ async function get_summoner_ids(rank, tier, page, key) {
 }
 
 async function get_summoner_match_ids(summoner_id, key) {
-	let puuid = await api_call(
-		`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/${summoner_id}?api_key=${key}`,
-	);
-	puuid = await puuid.json();
-	puuid = puuid.puuid;
-
 	const now = new Date();
 	const one_month_ago = new Date(now);
 	one_month_ago.setMonth(now.getMonth() - 1);
 	const start = Math.floor(one_month_ago.getTime() / 1000);
 
 	let match_history = await api_call(
-		`https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=${start}&queue=420&start=0&count=50&api_key=${key}`,
+		`https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${summoner_id}/ids?startTime=${start}&queue=420&start=0&count=50&api_key=${key}`,
 	);
 	match_history = await match_history.json();
 
