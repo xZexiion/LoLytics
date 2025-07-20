@@ -45,6 +45,7 @@ async function create_initial_state(game) {
 			barons: 0,
 			elders: 0,
 			rifts: 0,
+			grubs: 0,
 			towers: [
 				1, // Top outer
 				1, // Top inner
@@ -75,8 +76,11 @@ async function create_initial_state(game) {
 				baronTimer: 0,
 				elderTimer: 0,
 				deathTimer: 0,
+				gold: 0,
 				level: 1,
 				creepscore: 0,
+				x: 0,
+				y: 0
 			});
 		}
 		state.teams.push(team);
