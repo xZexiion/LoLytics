@@ -2,7 +2,7 @@
   "name": "winpredictor",
   "version": "1.0.0",
   "description": "An AI powered software that predicts a persons chance of winning a league of legends game",
-  "main": "src/download_match_data.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "jest --verbose"
   },
