@@ -1,13 +1,13 @@
 import { get_game_data } from "./game.js";
 import fs from 'fs';
-import { api_keys } from "./api_keys.js";
+import { API_KEYS } from "./api_keys.js";
 import { get_ids } from "./get_match_ids.js";
 
 
 async function get_batch(match_ids) {
 	const promises = [];
 	for (let i = 0; i < match_ids.length; i++) {
-		promises.push(get_game_data(match_ids[i], api_keys[i]));
+		promises.push(get_game_data(match_ids[i], API_KEYS[i]));
 	}
 	const results = await Promise.all(promises);
 	const batch = [];
@@ -30,8 +30,8 @@ async function get_batch(match_ids) {
 	console.log(`Processing ${match_ids.length} matches`);
 
 	let idx = 0;
-	for (let i = 0; i < match_ids.length; i += api_keys.length) {
-		let batch = await get_batch(match_ids.slice(i, i + api_keys.length));
+	for (let i = 0; i < match_ids.length; i += API_KEYS.length) {
+		let batch = await get_batch(match_ids.slice(i, i + API_KEYS.length));
 		for (const game of batch) {
 			idx++;
 			fs.mkdirSync(`match_data/game_${idx}`);
