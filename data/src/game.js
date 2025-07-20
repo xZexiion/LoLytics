@@ -73,6 +73,7 @@ async function create_initial_state(game) {
 				kills: 0,
 				deaths: 0,
 				assists: 0,
+				atakhan: 0,
 				baronTimer: 0,
 				elderTimer: 0,
 				deathTimer: 0,
@@ -149,6 +150,8 @@ function process_monster_kill(state, event) {
 		state.teams[team_id].rifts += 1;
 	} else if (event.monsterType == 'HORDE') {
 		state.teams[team_id].grubs += 1;
+	} else if (event.monsterType == 'ATAKHAN') {
+		state.teams[team_id].atakhan = 1;
 	} else if (event.monsterType == 'BARON_NASHOR') {
 		for (const player of state.teams[team_id].players) {
 			// Only give the baron buff to players who are alive
