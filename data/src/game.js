@@ -104,6 +104,8 @@ function update_general_stats(state, frame) {
 		const team_id = parseInt(participant_id_int / 5);
 		state.teams[team_id].players[participant_id_int % 5].creepscore = participant.minionsKilled + participant.jungleMinionsKilled;
 		state.teams[team_id].players[participant_id_int % 5].level = participant.level;
+		state.teams[team_id].players[participant_id_int % 5].x = participant.position.x;
+		state.teams[team_id].players[participant_id_int % 5].y = participant.position.y;
 	}
 
 	for (let team_id = 0; team_id < 2; team_id++) {
