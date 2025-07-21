@@ -13,15 +13,13 @@ async function get_batch(match_ids) {
 	for (const result of results) {
 		batch.push(result);
 	}
-	return batch.filter((batch) => batch != null);
+	return batch.filter((e) => e != null);
 }
 
 async function download_games(rank) {
 	let match_ids = await get_ids(rank);
 	match_ids = new Set(match_ids);
 	match_ids = Array.from(match_ids);
-
-	console.log(match_ids);
 
 	console.log(`Processing ${match_ids.length} matches`);
 
