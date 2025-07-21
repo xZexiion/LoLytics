@@ -75,7 +75,7 @@ async function get_match_id_batch(rank, tier, page) {
 	let match_ids = [];
 
 	const summoner_ids = await get_summoner_ids(rank, tier, page, API_KEYS[0]);
-	for (const summoner_id of summoner_ids.slice(0, 1)) {
+	for (const summoner_id of summoner_ids) {
 		promises.push(
 			get_summoner_match_ids(summoner_id, API_KEYS[promises.length]),
 		);
@@ -85,6 +85,7 @@ async function get_match_id_batch(rank, tier, page) {
 		) {
 			const results = await Promise.all(promises);
 			match_ids = match_ids.concat(...results);
+			match_ids = match_ids.filter((e) => e != null);
 			promises = [];
 		}
 	}
