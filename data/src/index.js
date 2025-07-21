@@ -1,8 +1,7 @@
 import { get_game_data } from "./game.js";
-import fs from 'fs';
+import fs from "fs";
 import { API_KEYS } from "./api_keys.js";
 import { get_ids } from "./get_match_ids.js";
-
 
 async function get_batch(match_ids) {
 	const promises = [];
@@ -14,7 +13,7 @@ async function get_batch(match_ids) {
 	for (const result of results) {
 		batch.push(result);
 	}
-	return batch.filter(batch => batch != null);
+	return batch.filter((batch) => batch != null);
 }
 
 async function download_games(rank) {
@@ -33,7 +32,10 @@ async function download_games(rank) {
 			idx++;
 			fs.mkdirSync(`match_data/${rank}/game_${idx}`);
 			for (let j = 0; j < game.length; j++) {
-				fs.writeFileSync(`match_data/${rank}/game_${idx}/${j}.json`, JSON.stringify(game[j]));
+				fs.writeFileSync(
+					`match_data/${rank}/game_${idx}/${j}.json`,
+					JSON.stringify(game[j]),
+				);
 			}
 		}
 		console.log(`Processed ${idx} matches`);
@@ -41,7 +43,18 @@ async function download_games(rank) {
 }
 
 async function main() {
-	const ranks = ['IRON', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'EMERALD', 'DIAMOND', 'MASTER', 'GRANDMASTER', 'CHALLENGER'];
+	const ranks = [
+		"IRON",
+		"BRONZE",
+		"SILVER",
+		"GOLD",
+		"PLATINUM",
+		"EMERALD",
+		"DIAMOND",
+		"MASTER",
+		"GRANDMASTER",
+		"CHALLENGER",
+	];
 
 	fs.mkdirSync(`match_data`);
 	for (const rank of ranks) {
@@ -51,4 +64,3 @@ async function main() {
 }
 
 main();
-

@@ -2,24 +2,28 @@ import { api_call, deep_copy } from "./utils.js";
 
 export async function get_game_data(MATCH_ID, key) {
 	// Get game and timeline data
-	let game = await api_call(`https://europe.api.riotgames.com/lol/match/v5/matches/${MATCH_ID}?api_key=${key}`);
+	let game = await api_call(
+		`https://europe.api.riotgames.com/lol/match/v5/matches/${MATCH_ID}?api_key=${key}`,
+	);
 	if (game.status != 200) {
-		console.log('failed to get game data');
+		console.log("failed to get game data");
 		return null;
 	}
 	game = await game.json();
-	
-	let timeline = await api_call(`https://europe.api.riotgames.com/lol/match/v5/matches/${MATCH_ID}/timeline?api_key=${key}`);
+
+	let timeline = await api_call(
+		`https://europe.api.riotgames.com/lol/match/v5/matches/${MATCH_ID}/timeline?api_key=${key}`,
+	);
 	if (timeline.status != 200) {
-		console.log('failed to get timeline data');
+		console.log("failed to get timeline data");
 		return null;
 	}
 	timeline = await timeline.json();
-	
+
 	// Create internal state
 	const state = await create_initial_state(game);
 	if (state == null) {
-		console.log('failed to create initial state');
+		console.log("failed to create initial state");
 		return null;
 	}
 
@@ -57,13 +61,13 @@ async function create_initial_state(game) {
 				1, // Bot inner
 				1, // Bot base
 				0, // Nexus
-				0 // Nexus
+				0, // Nexus
 			],
 			inhibs: [
 				0, // Top
 				0, // Mid
-				0 // Bot
-			]
+				0, // Bot
+			],
 		};
 		for (let j = 0; j < 5; j++) {
 			const playerIndex = i * 5 + j;
@@ -81,7 +85,7 @@ async function create_initial_state(game) {
 				level: 1,
 				creepscore: 0,
 				x: 0,
-				y: 0
+				y: 0,
 			});
 		}
 		state.teams.push(team);
@@ -103,11 +107,16 @@ function update_general_stats(state, frame) {
 		const participant = frame.participantFrames[participant_id];
 		const participant_id_int = parseInt(participant_id) - 1;
 		const team_id = parseInt(participant_id_int / 5);
-		state.teams[team_id].players[participant_id_int % 5].creepscore = participant.minionsKilled + participant.jungleMinionsKilled;
-		state.teams[team_id].players[participant_id_int % 5].level = participant.level;
-		state.teams[team_id].players[participant_id_int % 5].x = participant.position.x;
-		state.teams[team_id].players[participant_id_int % 5].y = participant.position.y;
-		state.teams[team_id].players[participant_id_int % 5].gold = participant.totalGold;
+		state.teams[team_id].players[participant_id_int % 5].creepscore =
+			participant.minionsKilled + participant.jungleMinionsKilled;
+		state.teams[team_id].players[participant_id_int % 5].level =
+			participant.level;
+		state.teams[team_id].players[participant_id_int % 5].x =
+			participant.position.x;
+		state.teams[team_id].players[participant_id_int % 5].y =
+			participant.position.y;
+		state.teams[team_id].players[participant_id_int % 5].gold =
+			participant.totalGold;
 	}
 
 	for (let team_id = 0; team_id < 2; team_id++) {
@@ -124,26 +133,32 @@ function update_general_stats(state, frame) {
 		// Update inhib timers
 		for (let i = 0; i < 3; i++) {
 			state.teams[team_id].inhibs[i] -= 1;
-			state.teams[team_id].inhibs[i] = Math.max(state.teams[team_id].inhibs[i], 0); // Cap inhib respawn timer to 0
+			state.teams[team_id].inhibs[i] = Math.max(
+				state.teams[team_id].inhibs[i],
+				0,
+			); // Cap inhib respawn timer to 0
 		}
 
 		// Update nexus tower timers
-		for(const tower_id of [9, 10]) {
+		for (const tower_id of [9, 10]) {
 			state.teams[team_id].towers[tower_id] -= 1;
-			state.teams[team_id].towers[tower_id] = Math.max(state.teams[team_id].towers[tower_id], 0); // Cap tower respawn timer to 0
+			state.teams[team_id].towers[tower_id] = Math.max(
+				state.teams[team_id].towers[tower_id],
+				0,
+			); // Cap tower respawn timer to 0
 		}
 	}
 }
 
 function update_with_event(state, event) {
 	switch (event.type) {
-		case 'CHAMPION_KILL':
+		case "CHAMPION_KILL":
 			process_champion_kill(state, event);
 			break;
-		case 'BUILDING_KILL':
+		case "BUILDING_KILL":
 			process_building_kill(state, event);
 			break;
-		case 'ELITE_MONSTER_KILL':
+		case "ELITE_MONSTER_KILL":
 			process_monster_kill(state, event);
 			break;
 	}
@@ -151,15 +166,15 @@ function update_with_event(state, event) {
 
 function process_monster_kill(state, event) {
 	const team_id = parseInt((event.killerId - 1) / 5);
-	if (event.monsterType == 'DRAGON') {
+	if (event.monsterType == "DRAGON") {
 		state.teams[team_id].drakes.push(event.monsterSubType);
-	} else if (event.monsterType == 'RIFTHERALD') {
+	} else if (event.monsterType == "RIFTHERALD") {
 		state.teams[team_id].rifts += 1;
-	} else if (event.monsterType == 'HORDE') {
+	} else if (event.monsterType == "HORDE") {
 		state.teams[team_id].grubs += 1;
-	} else if (event.monsterType == 'ATAKHAN') {
+	} else if (event.monsterType == "ATAKHAN") {
 		state.teams[team_id].atakhan = 1;
-	} else if (event.monsterType == 'BARON_NASHOR') {
+	} else if (event.monsterType == "BARON_NASHOR") {
 		for (const player of state.teams[team_id].players) {
 			// Only give the baron buff to players who are alive
 			if (player.deathTimer == 0) {
@@ -167,7 +182,7 @@ function process_monster_kill(state, event) {
 			}
 		}
 		state.teams[team_id].barons += 1;
-	} else if (event.monsterType == 'ELDER_DRAGON') {
+	} else if (event.monsterType == "ELDER_DRAGON") {
 		for (const player of state.teams[team_id].players) {
 			// Only give the elder buff to players who are alive
 			if (player.deathTimer == 0) {
@@ -179,19 +194,19 @@ function process_monster_kill(state, event) {
 }
 
 function process_building_kill(state, event) {
-	if (event.buildingType == 'TOWER_BUILDING') {
+	if (event.buildingType == "TOWER_BUILDING") {
 		let tower_id = 0;
 		const team_id = parseInt(event.teamId / 100) - 1;
-		if (event.laneType == 'BOT_LANE') {
+		if (event.laneType == "BOT_LANE") {
 			tower_id = 6;
-		} else if (event.laneType == 'MID_LANE') {
+		} else if (event.laneType == "MID_LANE") {
 			tower_id = 3;
 		}
-		if (event.towerType == 'INNER_TURRET') {
+		if (event.towerType == "INNER_TURRET") {
 			tower_id += 1;
-		} else if (event.towerType == 'BASE_TURRET') {
+		} else if (event.towerType == "BASE_TURRET") {
 			tower_id += 2;
-		} else if (event.towerType == 'NEXUS_TURRET') {
+		} else if (event.towerType == "NEXUS_TURRET") {
 			const t1 = state.teams[team_id].towers[9];
 			const t2 = state.teams[team_id].towers[10];
 			if (t1 == 0 && t2 == 0) {
@@ -205,12 +220,11 @@ function process_building_kill(state, event) {
 		} else {
 			state.teams[team_id].towers[tower_id] = 0;
 		}
-		
-	} else if (event.buildingType == 'INHIBITOR_BUILDING') {
+	} else if (event.buildingType == "INHIBITOR_BUILDING") {
 		let lane = 0;
-		if (event.laneType == 'MID_LANE') {
+		if (event.laneType == "MID_LANE") {
 			lane = 1;
-		} else if (event.laneType == 'BOT_LANE') {
+		} else if (event.laneType == "BOT_LANE") {
 			lane = 2;
 		}
 		const team_id = parseInt(event.teamId / 100) - 1;
@@ -225,23 +239,28 @@ function process_champion_kill(state, event) {
 		state.teams[team_id].players[(event.killerId - 1) % 5].kills += 1;
 	}
 	const victim_team_id = parseInt((event.victimId - 1) / 5);
-	const victim = state.teams[victim_team_id].players[(event.victimId - 1) % 5];
+	const victim =
+		state.teams[victim_team_id].players[(event.victimId - 1) % 5];
 	victim.deaths += 1;
 	victim.baronTimer = 0;
 	victim.elderTimer = 0;
 	const deathTimer = calc_death_timer(victim.level, time);
 	const nextWholeMinute = (Math.ceil(time) - time) * 60;
-	victim.deathTimer = Math.max((deathTimer - nextWholeMinute), 0);
+	victim.deathTimer = Math.max(deathTimer - nextWholeMinute, 0);
 	if (event.assistingParticipantIds) {
 		for (const assist_id of event.assistingParticipantIds) {
 			const assist_team_id = parseInt((assist_id - 1) / 5);
-			state.teams[assist_team_id].players[(assist_id - 1) % 5].assists += 1;
+			state.teams[assist_team_id].players[(assist_id - 1) % 5].assists +=
+				1;
 		}
 	}
 }
 
 export function calc_death_timer(level, time) {
-	const BRW = [6, 6, 8, 8, 10, 12, 16, 21, 26, 32.5, 35, 37.5, 40, 42.5, 45, 47.5, 50, 52.5];
+	const BRW = [
+		6, 6, 8, 8, 10, 12, 16, 21, 26, 32.5, 35, 37.5, 40, 42.5, 45, 47.5, 50,
+		52.5,
+	];
 	const current_brw = BRW[level - 1];
 	const current_tif = calc_tif(time) / 100;
 	return current_brw + current_brw * current_tif;
