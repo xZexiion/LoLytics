@@ -1,5 +1,9 @@
 import numpy as np
 import json
+import lmdb
+import pickle
+from tqdm import tqdm
+import os
 
 with open('champion_to_index.json') as f:
     champ_to_idx = json.load(f)
@@ -34,10 +38,21 @@ def convert_json_sample_to_numpy(sample):
 
     return np.array(l, dtype='int32')
 
-with open('../data/match_data/PLATINUM/game_230/5.json') as f:
-    x = json.load(f)
-    y = convert_json_sample_to_numpy(x)
-    print(y.dtype)
-    print(y.shape)
-    print(y)
-    print(len(y))
+def main():
+    lmdb_path = "dataset.lmdb"
+    map_size = 1 << 40  # 1 TB max size (can be larger than needed)
+
+    env = lmdb.open(lmdb_path, map_size=map_size)
+
+    with env.begin(write=True) as txn:
+        for i, (dirname, _, file_names) in tqdm(enumerate(os.walk('../data/match_data'))):
+            for file_name in file_names:
+                path = os.path.join(dirname, file_name)
+                with open(path) as f:
+                    obj = json.load(f)
+                    data = convert_json_sample_to_numpy(obj)
+                key = str(i).encode()
+                value = pickle.dumps(data)
+                txn.put(key, value)
+
+main()
