@@ -2,3 +2,4 @@
 my_dir
 .ipynb_checkpoints
 __pycache__
+*.lmdb
