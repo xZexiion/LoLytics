@@ -34,3 +34,25 @@ export function deep_copy(obj) {
 	}
 	return copy;
 }
+
+export async function fetch_with_retries(url, timeout = 3000) {
+	for (let attempt = 1; attempt <= 3; attempt++) {
+		try {
+			const response = await api_call(url);
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+			return await response.json(); // or `return response` if you want the raw response
+		} catch (error) {
+			if (attempt < 3) {
+				console.warn(
+					`Attempt ${attempt} failed. Retrying in ${timeout}ms...`,
+				);
+				await new Promise((resolve) => setTimeout(resolve, timeout));
+			} else {
+				console.error(`Attempt ${attempt} failed. Returning null.`);
+				return null;
+			}
+		}
+	}
+}

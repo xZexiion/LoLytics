@@ -6,6 +6,8 @@ export async function get_game_data(MATCH_ID, key) {
 		`https://europe.api.riotgames.com/lol/match/v5/matches/${MATCH_ID}?api_key=${key}`,
 	);
 	if (game.status != 200) {
+		console.log(game);
+		console.log(key);
 		console.log("failed to get game data");
 		return null;
 	}

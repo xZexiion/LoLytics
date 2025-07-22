@@ -8,12 +8,13 @@ async function get_batch(match_ids) {
 	for (let i = 0; i < match_ids.length; i++) {
 		promises.push(get_game_data(match_ids[i], API_KEYS[i]));
 	}
-	const results = await Promise.all(promises);
-	const batch = [];
-	for (const result of results) {
-		batch.push(result);
+	try {
+		const results = await Promise.all(promises);
+		return results.filter((e) => e != null);
+	} catch (e) {
+		console.log(e);
+		return [];
 	}
-	return batch.filter((e) => e != null);
 }
 
 async function download_games(rank) {
@@ -41,23 +42,16 @@ async function download_games(rank) {
 }
 
 async function main() {
-	const ranks = [
-		"IRON",
-		"BRONZE",
-		"SILVER",
-		"GOLD",
-		"PLATINUM",
-		"EMERALD",
-		"DIAMOND",
-		"MASTER",
-		"GRANDMASTER",
-		"CHALLENGER",
-	];
+	const ranks = ["PLATINUM", "EMERALD", "DIAMOND"];
 
 	fs.mkdirSync(`match_data`);
 	for (const rank of ranks) {
 		fs.mkdirSync(`match_data/${rank}`);
-		await download_games(rank);
+		try {
+			await download_games(rank);
+		} catch (e) {
+			console.log(e);
+		}
 	}
 }
 
