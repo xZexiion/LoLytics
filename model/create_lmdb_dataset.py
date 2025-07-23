@@ -7,6 +7,7 @@ import os
 
 with open('champion_to_index.json') as f:
     champ_to_idx = json.load(f)
+
 dragon_names = ['WATER_DRAGON', 'AIR_DRAGON', 'CHEMTECH_DRAGON', 'FIRE_DRAGON', 'HEXTECH_DRAGON', 'EARTH_DRAGON']
 
 def convert_json_sample_to_numpy(sample):
@@ -38,7 +39,7 @@ def convert_json_sample_to_numpy(sample):
 
 def main():
     lmdb_path = "dataset.lmdb"
-    map_size = 1 << 40  # 1 TB max size (can be larger than needed)
+    map_size = 1 << 4
 
     env = lmdb.open(lmdb_path, map_size=map_size)
 

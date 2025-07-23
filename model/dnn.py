@@ -29,4 +29,3 @@ class DNN(nn.Module):
         x_final = torch.cat([x_non_cat, embedded_flat], dim=1)
 
         return self.fc(x_final)
-
