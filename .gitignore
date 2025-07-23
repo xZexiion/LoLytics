@@ -28,3 +28,4 @@ my_dir
 __pycache__
 *.lmdb
 .env
+api_keys.js
