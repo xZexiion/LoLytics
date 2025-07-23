@@ -72,7 +72,7 @@ async function create_initial_state(game) {
 			const playerIndex = i * 5 + j;
 			const champion = game.info.participants[playerIndex].championName;
 			team.players.push({
-				champion: champion,
+				champion,
 				kills: 0,
 				deaths: 0,
 				assists: 0,
