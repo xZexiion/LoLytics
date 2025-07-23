@@ -18,7 +18,6 @@ class Dataset(dutils.Dataset):
         else:
             self.keys = keys[num_train_samples:]
 
-
     def __len__(self):
         return len(self.keys)
 
