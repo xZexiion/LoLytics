@@ -1,7 +1,6 @@
 import { api_call, deep_copy } from "./utils.js";
 
 export async function get_game_data(MATCH_ID, key) {
-	// Get game and timeline data
 	let game = await api_call(
 		`https://europe.api.riotgames.com/lol/match/v5/matches/${MATCH_ID}?api_key=${key}`,
 	);
@@ -22,7 +21,6 @@ export async function get_game_data(MATCH_ID, key) {
 	}
 	timeline = await timeline.json();
 
-	// Create internal state
 	const state = await create_initial_state(game);
 	if (state == null) {
 		console.log("failed to create initial state");
@@ -167,7 +165,15 @@ function update_with_event(state, event) {
 function process_monster_kill(state, event) {
 	const team_id = parseInt((event.killerId - 1) / 5);
 	if (event.monsterType == "DRAGON") {
-		state.teams[team_id].drakes.push(event.monsterSubType);
+		if (event.monsterSubType == "ELDER_DRAGON") {
+			for (const player of state.teams[team_id].players) {
+				if (player.deathTimer == 0) {
+					player.elderTimer = 3;
+				}
+			}
+		} else {
+			state.teams[team_id].drakes.push(event.monsterSubType);
+		}
 	} else if (event.monsterType == "RIFTHERALD") {
 		state.teams[team_id].rifts += 1;
 	} else if (event.monsterType == "HORDE") {
@@ -176,16 +182,8 @@ function process_monster_kill(state, event) {
 		state.teams[team_id].atakhan = 1;
 	} else if (event.monsterType == "BARON_NASHOR") {
 		for (const player of state.teams[team_id].players) {
-			// Only give the baron buff to players who are alive
 			if (player.deathTimer == 0) {
 				player.baronTimer = 3;
-			}
-		}
-	} else if (event.monsterType == "ELDER_DRAGON") {
-		for (const player of state.teams[team_id].players) {
-			// Only give the elder buff to players who are alive
-			if (player.deathTimer == 0) {
-				player.elderTimer = 3;
 			}
 		}
 	}
