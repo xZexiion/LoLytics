@@ -51,6 +51,7 @@ async function create_initial_state(game) {
 			barons: 0,
 			elders: 0,
 			rifts: 0,
+			atakhan: 0,
 			grubs: 0,
 			towers: [
 				1, // Top outer
@@ -79,7 +80,6 @@ async function create_initial_state(game) {
 				kills: 0,
 				deaths: 0,
 				assists: 0,
-				atakhan: 0,
 				baronTimer: 0,
 				elderTimer: 0,
 				deathTimer: 0,
