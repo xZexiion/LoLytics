@@ -48,8 +48,6 @@ async function create_initial_state(game) {
 		const team = {
 			players: [],
 			drakes: [],
-			barons: 0,
-			elders: 0,
 			rifts: 0,
 			atakhan: 0,
 			grubs: 0,
@@ -183,7 +181,6 @@ function process_monster_kill(state, event) {
 				player.baronTimer = 3;
 			}
 		}
-		state.teams[team_id].barons += 1;
 	} else if (event.monsterType == "ELDER_DRAGON") {
 		for (const player of state.teams[team_id].players) {
 			// Only give the elder buff to players who are alive
@@ -191,7 +188,6 @@ function process_monster_kill(state, event) {
 				player.elderTimer = 3;
 			}
 		}
-		state.team[team_id].elders += 1;
 	}
 }
 
