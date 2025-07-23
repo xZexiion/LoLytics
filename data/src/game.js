@@ -122,9 +122,9 @@ function update_general_stats(state, frame) {
 		for (const player of state.teams[team_id].players) {
 			player.deathTimer -= 60;
 			player.deathTimer = Math.max(player.deathTimer, 0);
-			player.baronTimer--;
+			player.baronTimer -= 60;
 			player.baronTimer = Math.max(player.baronTimer, 0);
-			player.elderTimer--;
+			player.elderTimer -= 60;
 			player.elderTimer = Math.max(player.elderTimer, 0);
 		}
 
@@ -168,7 +168,8 @@ function process_monster_kill(state, event) {
 		if (event.monsterSubType == "ELDER_DRAGON") {
 			for (const player of state.teams[team_id].players) {
 				if (player.deathTimer == 0) {
-					player.elderTimer = 3;
+					const time_since_objective = (state.time * 60) - parseInt(event.timestamp / 1000);
+					player.elderTimer = (2 * 60 + 30) - time_since_objective; // 2 minutes minus 30 in seconds minus the number of seconds since the elder was taken
 				}
 			}
 		} else {
@@ -183,7 +184,8 @@ function process_monster_kill(state, event) {
 	} else if (event.monsterType == "BARON_NASHOR") {
 		for (const player of state.teams[team_id].players) {
 			if (player.deathTimer == 0) {
-				player.baronTimer = 3;
+				const time_since_objective = (state.time * 60) - parseInt(event.timestamp / 1000);
+				player.baronTimer = (3 * 60) - time_since_objective; // 3 minutes in seconds minus the number of seconds since the elder was taken
 			}
 		}
 	}
