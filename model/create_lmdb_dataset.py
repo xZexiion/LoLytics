@@ -25,8 +25,6 @@ def convert_json_sample_to_numpy(sample):
             one_hot = [0, 0, 0, 0, 0, 0]
             if i < len(team['drakes']):
                 name = team['drakes'][i]
-                if name == 'ELDER_DRAGON':
-                    continue
                 one_hot[dragon_names.index(name)] = 1
             l += one_hot
         l.append(team['rifts'])
