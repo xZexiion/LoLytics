@@ -26,7 +26,8 @@ class Dataset(dutils.Dataset):
         with self.env.begin() as txn:
             data = txn.get(key)
         sample = pickle.loads(data)
-        return sample
+
+        return sample[:-1], sample[-1]
 
 if __name__ == '__main__':
     ds = Dataset('dataset.lmdb', False, 0.8)
