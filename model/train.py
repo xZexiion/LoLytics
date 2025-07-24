@@ -1,4 +1,4 @@
-from dataset import Dataset
+from dataset import Dataset, load_data
 from dnn import DNN
 import torch
 from torch import nn
@@ -6,10 +6,6 @@ from torch import optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-import random
-import lmdb
-
-random.seed(42)
 
 device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
 print(f'Using {device}')
@@ -17,15 +13,9 @@ print(f'Using {device}')
 net = DNN()
 net = net.to(device)
 
-keys = []
-env = lmdb.open('dataset.lmdb', readonly=True, lock=False)
-with env.begin() as txn:
-    with txn.cursor() as cursor:
-        for key, _ in cursor:
-            keys.append(key)
-random.shuffle(keys)
-train_ds = Dataset(keys, env, True, 0.8)
-test_ds = Dataset(keys, env, False, 0.8)
+data = load_data('dataset.lmdb')
+train_ds = Dataset(data['keys'], data['env'], True, 0.8)
+test_ds = Dataset(data['keys'], data['env'], False, 0.8)
 train_dl = DataLoader(train_ds, batch_size=256, shuffle=True)
 test_dl = DataLoader(test_ds, batch_size=512, shuffle=True)
 

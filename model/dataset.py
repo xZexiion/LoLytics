@@ -1,6 +1,23 @@
 import torch
 import torch.utils.data as dutils
 import pickle
+import lmdb
+import random
+
+def load_data(data_path):
+    random.seed(42)
+    keys = []
+    env = lmdb.open('dataset.lmdb', readonly=True, lock=False)
+    with env.begin() as txn:
+        with txn.cursor() as cursor:
+            for key, _ in cursor:
+                keys.append(key)
+    random.shuffle(keys)
+
+    return {
+        'env': env,
+        'keys': keys
+    }
 
 class Dataset(dutils.Dataset):
     def __init__(self, keys, env, training, split):
