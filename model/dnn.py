@@ -54,6 +54,7 @@ class DNN(nn.Module):
         x_non_cat = x[:, mask]
 
         self.normalize(x_non_cat)
+        x_non_cat[:, -1] /= 50 # Time
 
         x_final = torch.cat([x_non_cat, embedded_flat], dim=1)
 
