@@ -43,8 +43,9 @@ def main():
 
     env = lmdb.open(lmdb_path, map_size=map_size)
 
+    idx = 0
     with env.begin(write=True) as txn:
-        for i, (dirname, _, file_names) in tqdm(enumerate(os.walk('../match_data'))):
+        for dirname, _, file_names in tqdm(os.walk('../match_data')):
             for file_name in file_names:
                 if file_name == '.DS_Store':
                     continue
@@ -52,8 +53,9 @@ def main():
                 with open(path) as f:
                     obj = json.load(f)
                     data = convert_json_sample_to_numpy(obj)
-                key = str(i).encode()
+                key = str(idx).encode()
                 value = pickle.dumps(data)
                 txn.put(key, value)
+                idx += 1
 
 main()
