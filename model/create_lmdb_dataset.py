@@ -29,6 +29,7 @@ def convert_json_sample_to_numpy(sample):
                 one_hot[dragon_names.index(name)] = 1
             l += one_hot
         l.append(team['rifts'])
+        l.append(team['atakhan'])
         l.append(team['grubs'])
         l += team['towers']
         l += team['inhibs']
