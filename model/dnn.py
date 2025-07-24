@@ -8,7 +8,7 @@ class DNN(nn.Module):
         self.champ_embedding = nn.Embedding(num_embeddings=171, embedding_dim=8)
 
         self.fc = nn.Sequential(
-            nn.Linear(230, 128),
+            nn.Linear(272, 128),
             nn.ReLU(),
             nn.Linear(128, 1)
         )
@@ -25,6 +25,8 @@ class DNN(nn.Module):
         mask = torch.ones(x.size(1), dtype=torch.bool, device=x.device)
         mask[self.champion_indices] = False
         x_non_cat = x[:, mask]
+
+        
 
         x_final = torch.cat([x_non_cat, embedded_flat], dim=1)
 
