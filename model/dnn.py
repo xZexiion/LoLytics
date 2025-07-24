@@ -37,7 +37,7 @@ class DNN(nn.Module):
         x[:, self.level_indices] /= 18
         x[:, self.x_indices] /= 14500
         x[:, self.y_indices] /= 14500
-        
+
     def forward(self, x):
         B = x.size(0)
 
@@ -52,7 +52,7 @@ class DNN(nn.Module):
         x_non_cat = x[:, mask].float()
 
         self.normalize(x_non_cat)
-        x_non_cat[:, -1] /= 50 # Time
+        x_non_cat[:, -1] /= 50
 
         x_final = torch.cat([x_non_cat, embedded_flat], dim=1)
 
