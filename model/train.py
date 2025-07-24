@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import random
 import lmdb
 
+random.seed(42)
+
 device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
 print(f'Using {device}')
 
@@ -69,7 +71,7 @@ def test(model, optimizer, criterion, dataloader):
 
 train_losses = []
 test_losses = []
-for epoch in range(1):
+for epoch in range(10):
     train_loss = train_epoch(net, optimizer, loss_fn, train_dl)
     test_loss = test(net, optimizer, loss_fn, test_dl)
     print(f'Epoch {epoch+1}) Train loss: {train_loss} Test loss: {test_loss}')
