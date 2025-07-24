@@ -6,6 +6,8 @@ from torch import optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import random
+import lmdb
 
 device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
 print(f'Using {device}')
@@ -13,8 +15,15 @@ print(f'Using {device}')
 net = DNN()
 net = net.to(device)
 
-train_ds = Dataset('dataset.lmdb', True, 0.8)
-test_ds = Dataset('dataset.lmdb', False, 0.8)
+keys = []
+env = lmdb.open('dataset.lmdb', readonly=True, lock=False)
+with env.begin() as txn:
+    with txn.cursor() as cursor:
+        for key, _ in cursor:
+            keys.append(key)
+random.shuffle(keys)
+train_ds = Dataset(keys, env, True, 0.8)
+test_ds = Dataset(keys, env, False, 0.8)
 train_dl = DataLoader(train_ds, batch_size=256, shuffle=True)
 test_dl = DataLoader(test_ds, batch_size=512, shuffle=True)
 
@@ -50,7 +59,7 @@ def test(model, optimizer, criterion, dataloader):
             inputs, labels = inputs.to(device), labels.to(device)
 
             y_pred = model(inputs)
-            loss = criterion(y_pred, labels.float())
+            loss = criterion(y_pred, labels.float().view(-1, 1))
 
             avg_loss += loss.item()
 
