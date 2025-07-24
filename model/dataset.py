@@ -1,17 +1,10 @@
 import torch
 import torch.utils.data as dutils
-import lmdb
 import pickle
 
 class Dataset(dutils.Dataset):
-    def __init__(self, data_path, training, split):
-        keys = []
-        self.env = lmdb.open(data_path, readonly=True, lock=False)
-        with self.env.begin() as txn:
-            with txn.cursor() as cursor:
-                for key, _ in cursor:
-                    keys.append(key)
-        keys.sort()
+    def __init__(self, keys, env, training, split):
+        self.env = env
         num_train_samples = int(len(keys) * split)
         if training:
             self.keys = keys[:num_train_samples]
