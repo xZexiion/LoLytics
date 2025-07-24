@@ -39,13 +39,15 @@ def convert_json_sample_to_numpy(sample):
 
 def main():
     lmdb_path = "dataset.lmdb"
-    map_size = 1 << 4
+    map_size = 1 << 40
 
     env = lmdb.open(lmdb_path, map_size=map_size)
 
     with env.begin(write=True) as txn:
-        for i, (dirname, _, file_names) in tqdm(enumerate(os.walk('../data/match_data'))):
+        for i, (dirname, _, file_names) in tqdm(enumerate(os.walk('../match_data'))):
             for file_name in file_names:
+                if file_name == '.DS_Store':
+                    continue
                 path = os.path.join(dirname, file_name)
                 with open(path) as f:
                     obj = json.load(f)
