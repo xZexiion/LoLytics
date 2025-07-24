@@ -8,9 +8,19 @@ class DNN(nn.Module):
         self.champ_embedding = nn.Embedding(num_embeddings=171, embedding_dim=8)
 
         self.fc = nn.Sequential(
-            nn.Linear(273, 128),
+            nn.Linear(273, 256),
             nn.ReLU(),
-            nn.Linear(128, 1)
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, 32),
+            nn.ReLU(),
+            nn.Linear(32, 1)
         )
 
         self.kill_indices = torch.tensor([0, 11, 22, 33, 44, 96, 107, 118, 129, 140])
