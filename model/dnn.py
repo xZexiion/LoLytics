@@ -1,8 +1,6 @@
 import torch
 from torch import nn
 
-def normalize():
-
 class DNN(nn.Module):
     def __init__(self):
         super().__init__()
@@ -10,7 +8,7 @@ class DNN(nn.Module):
         self.champ_embedding = nn.Embedding(num_embeddings=171, embedding_dim=8)
 
         self.fc = nn.Sequential(
-            nn.Linear(272, 128),
+            nn.Linear(273, 128),
             nn.ReLU(),
             nn.Linear(128, 1)
         )
@@ -27,7 +25,7 @@ class DNN(nn.Module):
         self.x_indices = torch.tensor([9, 20, 31, 42, 53, 105, 116, 127, 138, 149])
         self.y_indices = torch.tensor([10, 21, 32, 43, 54, 106, 117, 128, 139, 150])
 
-    def normalize(x):
+    def normalize(self, x):
         x[:, self.kill_indices] = (x[:, self.kill_indices] - 2.686) / 3.281
         x[:, self.death_indices] = (x[:, self.death_indices] - 2.698) / 2.754
         x[:, self.assist_indices] = (x[:, self.assist_indices] - 3.259) / 4.216
@@ -35,7 +33,7 @@ class DNN(nn.Module):
         x[:, self.cs_indices] = (x[:, self.cs_indices] - 88.101) / 74.53
         x[:, self.baron_indices] /= 3*60
         x[:, self.elder_indices] /= 2*60+30
-        x[:, self.death_timer] /= 79
+        x[:, self.death_timer_indices] /= 79
         x[:, self.level_indices] /= 18
         x[:, self.x_indices] /= 14500
         x[:, self.y_indices] /= 14500
@@ -51,7 +49,7 @@ class DNN(nn.Module):
 
         mask = torch.ones(x.size(1), dtype=torch.bool, device=x.device)
         mask[self.champion_indices] = False
-        x_non_cat = x[:, mask]
+        x_non_cat = x[:, mask].float()
 
         self.normalize(x_non_cat)
         x_non_cat[:, -1] /= 50 # Time
