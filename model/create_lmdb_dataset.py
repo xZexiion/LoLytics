@@ -39,18 +39,19 @@ def convert_json_sample_to_numpy(sample):
 
     return np.array(l, dtype='int32')
 
-def get_file_paths(data_dir):
+def get_game_paths(data_dir):
     paths = []
 
-    for dirname, _, file_names in tqdm(os.walk(data_dir)):
-        for file_name in file_names:
-            if file_name == '.DS_Store':
+    for rank in os.listdir(data_dir):
+        if rank == '.DS_Store':
+            continue
+        for match_dir in os.listdir(os.path.join(data_dir, rank)):
+            if match_dir == '.DS_Store':
                 continue
-            path = os.path.join(dirname, file_name)
-            paths.append(path)
+            paths.append(os.path.join(data_dir, rank, match_dir))
 
     return paths
-    
+
 def save_lmdb(paths, lmdb_path):
     map_size = 1 << 40
     env = lmdb.open(lmdb_path, map_size=map_size)
@@ -58,26 +59,29 @@ def save_lmdb(paths, lmdb_path):
     idx = 0
     with env.begin(write=True) as txn:
         for path in tqdm(paths):
-            with open(path) as f:
-                obj = json.load(f)
-                data = convert_json_sample_to_numpy(obj)
-            key = str(idx).encode()
-            value = pickle.dumps(data)
-            txn.put(key, value)
-            idx += 1
+            for file in os.listdir(path):
+                if file == '.DS_Store':
+                    continue
+                with open(os.path.join(path, file)) as f:
+                    obj = json.load(f)
+                    data = convert_json_sample_to_numpy(obj)
+                key = str(idx).encode()
+                value = pickle.dumps(data)
+                txn.put(key, value)
+                idx += 1
 
 def main():
-    file_paths = get_file_paths('../match_data')
-    random.shuffle(file_paths)
+    paths = get_game_paths('../match_data')
+    random.shuffle(paths)
 
     split = 0.8
 
-    num_train_samples = int(len(file_paths) * split)
-    train_paths = file_paths[:num_train_samples]
-    test_paths = file_paths[num_train_samples:]
+    num_train_samples = int(len(paths) * split)
+    train_paths = paths[:num_train_samples]
+    test_paths = paths[num_train_samples:]
 
     save_lmdb(train_paths, 'train.lmdb')
     save_lmdb(test_paths, 'test.lmdb')
-    
+
 
 main()
