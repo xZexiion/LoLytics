@@ -42,7 +42,7 @@ def convert_json_sample_to_numpy(sample):
 def get_file_paths(data_dir):
     paths = []
 
-    for dirname, _, file_names in tqdm(os.walk('../match_data')):
+    for dirname, _, file_names in tqdm(os.walk(data_dir)):
         for file_name in file_names:
             if file_name == '.DS_Store':
                 continue
@@ -57,7 +57,7 @@ def save_lmdb(paths, lmdb_path):
 
     idx = 0
     with env.begin(write=True) as txn:
-        for path in paths:
+        for path in tqdm(paths):
             with open(path) as f:
                 obj = json.load(f)
                 data = convert_json_sample_to_numpy(obj)
@@ -67,7 +67,7 @@ def save_lmdb(paths, lmdb_path):
             idx += 1
 
 def main():
-    file_paths = get_paths()
+    file_paths = get_file_paths('../match_data')
     random.shuffle(file_paths)
 
     split = 0.8
