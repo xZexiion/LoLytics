@@ -61,14 +61,14 @@ def test(model, optimizer, criterion, dataloader):
 
 train_losses = []
 test_losses = []
-for epoch in range(10):
+for epoch in range(20):
     train_loss = train_epoch(net, optimizer, loss_fn, train_dl)
     test_loss = test(net, optimizer, loss_fn, test_dl)
     train_losses.append(train_loss)
     test_losses.append(test_loss)
     print(f'Epoch {epoch+1}) Train loss: {train_loss} Test loss: {test_loss}')
 
-plt.figure(figsize=(5, 5))
+plt.figure(figsize=(8, 5))
 plt.title('Training And Testing Loss')
 plt.plot(train_losses, label='Train')
 plt.plot(test_losses, label='Test')
