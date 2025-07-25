@@ -1,4 +1,4 @@
-from dataset import Dataset, load_data
+from dataset import Dataset
 from dnn import DNN
 import torch
 from torch import nn
@@ -8,14 +8,14 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
+device = 'cpu'
 print(f'Using {device}')
 
 net = DNN()
 net = net.to(device)
 
-data = load_data('dataset.lmdb')
-train_ds = Dataset(data['keys'], data['env'], True, 0.8)
-test_ds = Dataset(data['keys'], data['env'], False, 0.8)
+train_ds = Dataset('train.lmdb')
+test_ds = Dataset('test.lmdb')
 train_dl = DataLoader(train_ds, batch_size=256, shuffle=True)
 test_dl = DataLoader(test_ds, batch_size=512, shuffle=True)
 
@@ -43,7 +43,7 @@ def train_epoch(model, optimizer, criterion, dataloader):
     return avg_loss
 
 def test(model, optimizer, criterion, dataloader):
-    model.train()
+    model.eval()
     avg_loss = 0
 
     with torch.no_grad():
@@ -64,14 +64,17 @@ test_losses = []
 for epoch in range(10):
     train_loss = train_epoch(net, optimizer, loss_fn, train_dl)
     test_loss = test(net, optimizer, loss_fn, test_dl)
+    train_losses.append(train_loss)
+    test_losses.append(test_loss)
     print(f'Epoch {epoch+1}) Train loss: {train_loss} Test loss: {test_loss}')
 
-plt.figure(figsize=(8, 8))
+plt.figure(figsize=(5, 5))
 plt.title('Training And Testing Loss')
 plt.plot(train_losses, label='Train')
 plt.plot(test_losses, label='Test')
 plt.legend()
 plt.show()
 
+net = net.cpu()
 
-torch.save(net.state_dict(), 'net.pth')
+torch.save(net.state_dict(), 'dnn.pth')
