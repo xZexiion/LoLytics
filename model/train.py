@@ -16,7 +16,7 @@ net = net.to(device)
 
 train_ds = Dataset('train.lmdb')
 test_ds = Dataset('test.lmdb')
-train_dl = DataLoader(train_ds, batch_size=256, shuffle=True)
+train_dl = DataLoader(train_ds, batch_size=64, shuffle=True)
 test_dl = DataLoader(test_ds, batch_size=512, shuffle=True)
 
 optimizer = optim.Adam(net.parameters(), lr=1e-3)
@@ -59,9 +59,12 @@ def test(model, optimizer, criterion, dataloader):
 
     return avg_loss
 
+initial_loss = test(net, optimizer, loss_fn, test_dl)
+print(f'Initial Test Loss: {initial_loss}')
+
 train_losses = []
 test_losses = []
-for epoch in range(20):
+for epoch in range(10):
     train_loss = train_epoch(net, optimizer, loss_fn, train_dl)
     test_loss = test(net, optimizer, loss_fn, test_dl)
     train_losses.append(train_loss)
