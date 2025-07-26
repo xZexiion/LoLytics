@@ -20,8 +20,7 @@ net.load_state_dict(torch.load('dnn.pth', map_location=device, weights_only=True
 net = net.to(device)
 
 with torch.no_grad():
-    for _ in tqdm(range(10000)):
-        sample = next(data_iter)
+    for sample in tqdm(dataset):
         inputs, label = sample
 
         inputs = torch.tensor(inputs).view(1, -1).to(device)
