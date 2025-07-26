@@ -6,25 +6,20 @@ import matplotlib.pyplot as plt
 
 dataset = Dataset('test.lmdb')
 
-device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
-device = 'cpu'
-print(f'Using {device}')
-
 data_iter = iter(dataset)
 
 l = [0] * 40
 t = [0] * 40
 
 net = DNN()
-net.load_state_dict(torch.load('dnn.pth', map_location=device, weights_only=True))
-net = net.to(device)
+net.load_state_dict(torch.load('dnn.pth', weights_only=True))
 
 with torch.no_grad():
     for sample in tqdm(dataset):
         inputs, label = sample
 
-        inputs = torch.tensor(inputs).view(1, -1).to(device)
-        label = torch.tensor(label, dtype=torch.float).to(device)
+        inputs = torch.tensor(inputs).view(1, -1)
+        label = torch.tensor(label, dtype=torch.float)
 
         time = inputs[0][-1].item()
         if time >= 40:

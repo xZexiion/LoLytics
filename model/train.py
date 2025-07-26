@@ -7,12 +7,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
-device = 'cpu'
-print(f'Using {device}')
-
 net = DNN()
-net = net.to(device)
 
 train_ds = Dataset('train.lmdb')
 test_ds = Dataset('test.lmdb')
@@ -27,8 +22,6 @@ def train_epoch(model, optimizer, criterion, dataloader):
     avg_loss = 0
 
     for inputs, labels in tqdm(dataloader):
-        inputs, labels = inputs.to(device), labels.to(device)
-
         y_pred = model(inputs)
         loss = criterion(y_pred, labels.float().view(-1, 1))
 
@@ -48,7 +41,7 @@ def test(model, optimizer, criterion, dataloader):
 
     with torch.no_grad():
         for inputs, labels in tqdm(dataloader):
-            inputs, labels = inputs.to(device), labels.to(device)
+            inputs, labels = inputs, labels
 
             y_pred = model(inputs)
             loss = criterion(y_pred, labels.float().view(-1, 1))
