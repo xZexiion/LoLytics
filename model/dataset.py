@@ -12,6 +12,7 @@ class Dataset(dutils.Dataset):
                 for key, _ in cursor:
                     self.keys.append(key)
 
+        print(f'Found {len(self.keys)} samples in {data_path}')
     def __len__(self):
         return len(self.keys)
 
