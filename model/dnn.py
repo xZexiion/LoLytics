@@ -8,19 +8,10 @@ class DNN(nn.Module):
         self.champ_embedding = nn.Embedding(num_embeddings=171, embedding_dim=8)
 
         self.fc = nn.Sequential(
-            nn.Linear(273, 256),
+            nn.Linear(273, 128, bias=False),
+            nn.BatchNorm1d(128),
             nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 128),
-            nn.ReLU(),
-            nn.Linear(128, 128),
-            nn.ReLU(),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Linear(64, 32),
-            nn.ReLU(),
-            nn.Linear(32, 1)
+            nn.Linear(128, 1)
         )
 
         self.kill_indices = torch.tensor([0, 11, 22, 33, 44, 96, 107, 118, 129, 140])
@@ -47,13 +38,15 @@ class DNN(nn.Module):
         x[:, self.level_indices] /= 18
         x[:, self.x_indices] /= 14500
         x[:, self.y_indices] /= 14500
-        x[:, -1] /= 50
+        x[:, -1] /= 30
 
     def forward(self, x):
         B = x.size(0)
 
         champion_ids = x[:, self.champion_indices]
         champion_ids = champion_ids.long()
+
+        print(champion_ids)
 
         embedded = self.champ_embedding(champion_ids)
         embedded_flat = embedded.view(B, -1)
@@ -63,6 +56,9 @@ class DNN(nn.Module):
         x_non_cat = x[:, mask].float()
 
         self.normalize(x_non_cat)
+
+        for i in range(len(x_non_cat[0])):
+            print(f'{i}) {x_non_cat[0][i]}')
 
         x_final = torch.cat([x_non_cat, embedded_flat], dim=1)
 
