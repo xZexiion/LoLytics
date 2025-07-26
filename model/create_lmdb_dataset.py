@@ -59,16 +59,15 @@ def save_lmdb(paths, lmdb_path):
     idx = 0
     with env.begin(write=True) as txn:
         for path in tqdm(paths):
-            for file in os.listdir(path):
-                if file == '.DS_Store':
-                    continue
-                with open(os.path.join(path, file)) as f:
-                    obj = json.load(f)
-                    data = convert_json_sample_to_numpy(obj)
-                key = str(idx).encode()
-                value = pickle.dumps(data)
-                txn.put(key, value)
-                idx += 1
+            game_snapshot_files = [d for d in os.listdir(path) if d != '.DS_Store']
+            file = random.choice(game_snapshot_files)
+            with open(os.path.join(path, file)) as f:
+                obj = json.load(f)
+                data = convert_json_sample_to_numpy(obj)
+            key = str(idx).encode()
+            value = pickle.dumps(data)
+            txn.put(key, value)
+            idx += 1
 
 def main():
     paths = get_game_paths('../match_data')
