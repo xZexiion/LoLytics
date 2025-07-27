@@ -3,7 +3,7 @@ from dataset import Dataset
 import numpy as np
 import json
 
-dataset = Dataset('test.lmdb')
+dataset = Dataset('train.lmdb')
 
 kills = []
 deaths = []
