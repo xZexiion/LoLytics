@@ -1,15 +1,15 @@
 import torch
 from torch import nn
+import json
 
 class DNN(nn.Module):
     def __init__(self):
         super().__init__()
         self.champion_indices = torch.tensor([0, 12, 24, 36, 48, 101, 113, 125, 137, 149])
-        self.champ_embedding = nn.Embedding(num_embeddings=171, embedding_dim=8)
+        self.champ_embedding = nn.Embedding(num_embeddings=171, embedding_dim=16)
 
         self.fc = nn.Sequential(
-            nn.Linear(273, 128, bias=False),
-            nn.BatchNorm1d(128),
+            nn.Linear(193, 128),
             nn.ReLU(),
             nn.Linear(128, 1)
         )
@@ -26,12 +26,18 @@ class DNN(nn.Module):
         self.x_indices = torch.tensor([9, 20, 31, 42, 53, 105, 116, 127, 138, 149])
         self.y_indices = torch.tensor([10, 21, 32, 43, 54, 106, 117, 128, 139, 150])
 
+        with open('metrics.json') as f:
+            self.metrics = json.load(f)
+
+        
+
     def normalize(self, x):
-        x[:, self.kill_indices] = (x[:, self.kill_indices] - 2.686) / 3.281
-        x[:, self.death_indices] = (x[:, self.death_indices] - 2.698) / 2.754
-        x[:, self.assist_indices] = (x[:, self.assist_indices] - 3.259) / 4.216
-        x[:, self.gold_indices] = (x[:, self.gold_indices] - 5840.304) / 4262.559
-        x[:, self.cs_indices] = (x[:, self.cs_indices] - 88.101) / 74.53
+        x[:, self.kill_indices] = (x[:, self.kill_indices] - self.metrics['kills']['mean']) / self.metrics['kills']['std']
+        x[:, self.death_indices] = (x[:, self.death_indices] - self.metrics['deaths']['mean']) / self.metrics['deaths']['std']
+        x[:, self.assist_indices] = (x[:, self.assist_indices] - self.metrics['assists']['mean']) / self.metrics['assists']['std']
+        x[:, self.gold_indices] = (x[:, self.gold_indices] - self.metrics['gold']['mean']) / self.metrics['gold']['std']
+        x[:, self.cs_indices] = (x[:, self.cs_indices] - self.metrics['creepscore']['mean']) / self.metrics['creepscore']['std']
+
         x[:, self.baron_indices] /= 3*60
         x[:, self.elder_indices] /= 2*60+30
         x[:, self.death_timer_indices] /= 79
@@ -43,13 +49,11 @@ class DNN(nn.Module):
     def forward(self, x):
         B = x.size(0)
 
-        champion_ids = x[:, self.champion_indices]
-        champion_ids = champion_ids.long()
+        # champion_ids = x[:, self.champion_indices]
+        # champion_ids = champion_ids.long()
 
-        print(champion_ids)
-
-        embedded = self.champ_embedding(champion_ids)
-        embedded_flat = embedded.view(B, -1)
+        # embedded = self.champ_embedding(champion_ids)
+        # embedded_flat = embedded.view(B, -1)
 
         mask = torch.ones(x.size(1), dtype=torch.bool, device=x.device)
         mask[self.champion_indices] = False
@@ -57,9 +61,9 @@ class DNN(nn.Module):
 
         self.normalize(x_non_cat)
 
-        for i in range(len(x_non_cat[0])):
-            print(f'{i}) {x_non_cat[0][i]}')
+        # for i in range(len(x_non_cat[0])):
+            # print(f'{i}) {x_non_cat[0][i]}')
 
-        x_final = torch.cat([x_non_cat, embedded_flat], dim=1)
+        # x_final = torch.cat([x_non_cat, embedded_flat], dim=1)
 
-        return self.fc(x_final)
+        return self.fc(x_non_cat)

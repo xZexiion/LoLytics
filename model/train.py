@@ -11,10 +11,10 @@ net = DNN()
 
 train_ds = Dataset('train.lmdb')
 test_ds = Dataset('test.lmdb')
-train_dl = DataLoader(train_ds, batch_size=64, shuffle=True)
+train_dl = DataLoader(train_ds, batch_size=128, shuffle=True)
 test_dl = DataLoader(test_ds, batch_size=512, shuffle=True)
 
-optimizer = optim.Adam(net.parameters(), lr=1e-3)
+optimizer = optim.SGD(net.parameters(), lr=2e-4, momentum=0.99)
 loss_fn = nn.MSELoss()
 
 def train_epoch(model, optimizer, criterion, dataloader):
@@ -57,7 +57,7 @@ print(f'Initial Test Loss: {initial_loss}')
 
 train_losses = []
 test_losses = []
-for epoch in range(10):
+for epoch in range(50):
     train_loss = train_epoch(net, optimizer, loss_fn, train_dl)
     test_loss = test(net, optimizer, loss_fn, test_dl)
     train_losses.append(train_loss)
@@ -70,7 +70,5 @@ plt.plot(train_losses, label='Train')
 plt.plot(test_losses, label='Test')
 plt.legend()
 plt.show()
-
-net = net.cpu()
 
 torch.save(net.state_dict(), 'dnn.pth')

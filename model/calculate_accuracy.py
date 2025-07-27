@@ -30,7 +30,7 @@ with torch.no_grad():
         t[time] += 1
 
 for i in range(40):
-    l[i] /= t[i]
+    l[i] /= max(t[i], 1)
     l[i] *= 100
     l[i] = round(l[i])
 

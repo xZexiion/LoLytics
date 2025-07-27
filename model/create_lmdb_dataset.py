@@ -60,7 +60,7 @@ def save_lmdb(paths, lmdb_path):
     with env.begin(write=True) as txn:
         for path in tqdm(paths):
             game_snapshot_files = [d for d in os.listdir(path) if d != '.DS_Store']
-            file = random.choice(game_snapshot_files)
+            file = game_snapshot_files[-1]
             with open(os.path.join(path, file)) as f:
                 obj = json.load(f)
                 data = convert_json_sample_to_numpy(obj)
